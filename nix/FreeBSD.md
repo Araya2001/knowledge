@@ -1,4 +1,4 @@
-FREEBSD RPI4
+# FreeBSD Cheat-sheet
 
 User/passwd
 
