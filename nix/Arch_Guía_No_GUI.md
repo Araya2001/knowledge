@@ -1,4 +1,4 @@
-# Instalación de Arch-Linux en XPG xenia:
+# Instalación de Arch GNU/Linux :
 
 Cambiar teclado a español LA
 
