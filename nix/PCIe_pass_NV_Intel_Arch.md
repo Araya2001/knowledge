@@ -60,6 +60,7 @@ Modificar el XML de la máquina virtual con lo siguiente
       <hidden state='on'/>
     </kvm>
     <vmport state='off'/>
+    <smm state='on'/>
     <ioapic driver='kvm'/>
   </features>
   ...
