@@ -38,7 +38,7 @@ options vfio-pci ids=10de:2191,10de:1aeb,10de:1aec,10de:1aed
 Instalar y habilitar QEMU/KVM con libvirt
 
 ```
-$ sudo pacman -S libvirt iptables iptables-nft dnsmasq dmidecode qemu qemu-extra-arch virt-manager
+$ sudo pacman -S libvirt iptables iptables-nft dnsmasq dmidecode qemu qemu-extra-arch virt-manager edk2-ovmf
 $ sudo usermod -aG libvirt aaj
 $ sudo systemctl enable libvirtd.service
 ```
