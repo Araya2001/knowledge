@@ -252,3 +252,35 @@ Borrar un entry con efibootmgr (Ver entries primero para verificar que sea el bo
 # efibootmgr -b XXXX -B
 ```
 
+**Archivo personal de /etc/default/grub**
+
+```bash
+# nano /etc/default/grub
+...
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=1
+GRUB_DISTRIBUTOR="Arch"
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 i8042.noaux=1 iommu=pt intel_iommu=on pcie_acs_override=downstream,multifunction" # i8042.noaux=1 -> para que el teclado funcione post-sleep. A diferencia de loglevel=3 y el mencionado anteriormente, el resto es para lograr PCIe passthrough
+GRUB_CMDLINE_LINUX=""
+GRUB_PRELOAD_MODULES="part_gpt part_msdos"
+GRUB_TIMEOUT_STYLE=menu
+GRUB_TERMINAL_INPUT=console
+GRUB_GFXMODE="1920x1080x32"
+GRUB_GFXPAYLOAD_LINUX=keep
+GRUB_DISABLE_RECOVERY=true
+GRUB_DISABLE_OS_PROBER=false
+...
+```
+
+Actualizar grub:
+
+```
+# grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+Actualizar initram:
+
+```
+# sudo mkinitcpio -P
+```
+
