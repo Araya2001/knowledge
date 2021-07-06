@@ -1,25 +1,25 @@
 # Instalación de Arch GNU/Linux :
 
-Cambiar teclado a español LA
+Cambiar teclado a español LA:
 
 ```
 # loadkeys la-latin1
 ```
 
-Verificar estado de red (Si es DHCP por cable, solo hacer ping)
+Verificar estado de red (Si es DHCP por cable, solo hacer ping):
 
 ```
 # ping 8.8.8.8
 ```
 
-Actualizar el reloj del sistema
+Actualizar el reloj del sistema:
 
 ```
 # timedatectl set-ntp true
 # timedatectl status
 ```
 
-Particionar los discos
+Particionar los discos:
 */dev/sdX no es un parámetro fijo, este cambia según este nombrado el dispositivo de almacenamiento a usar
 
 ```
@@ -98,7 +98,7 @@ Cambiar root:
 # arch-chroot /mnt
 ```
 
-Una vez dentro, cambiar zona horaria
+Una vez dentro, cambiar zona horaria:
 
 ```
 # timedatectl list-timezones
@@ -113,7 +113,7 @@ Setear locale:
 
 Quitar comentario del (los) locale(s) que se desee(n)
 
-generar locale
+Generar locale:
 
 ```
 # locale-gen
@@ -132,7 +132,7 @@ Crear y modificar el siguiente archivo:
 # nano /etc/hosts
 ```
 
-En /etc/hosts
+En /etc/hosts:
 
 ```
 127.0.0.1       localhost
@@ -146,7 +146,7 @@ DHCP en interfaz:
 # nano /etc/systemd/network/20-wired.network
 ```
 
-en /etc/systemd/network/20-wired.network
+En /etc/systemd/network/20-wired.network:
 
 ```bash
 [Match]
@@ -156,13 +156,21 @@ Name=enp60s0
 DHCP=yes
 ```
 
-verificar que el systemd-networkd.service este habilitado
+Verificar que el systemd-networkd.service este habilitado:
 
 ```
 # systemctl status systemd-networkd.service
 ```
 
-Instalar grub, os-prober y efibootmgr
+Instalar binutils y fakeroot para usar makepkg (Ver documentación de AUR):
+
+```
+# pacman -S binutils fakeroot
+```
+
+**No Secure-boot:** 
+
+Instalar grub, os-prober y efibootmgr:
 
 ```
 # pacman -S grub efibootmgr os-prober
@@ -172,17 +180,75 @@ Instalar grub en partición para efi:
 
 ```
 # mkdir /boot/efi; mount /dev/sdX1 /boot/efi
-# grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+# grub-install --target=x86_64-efi --bootloader-id=Arch --efi-directory=/boot/efi
 # grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-Instalar binutils y fakeroot para usar makepkg (Ver documentación de AUR)
+**Secure-boot:**
+
+Instalar los siguientes paquetes:
 
 ```
-# pacman -S binutils fakeroot
+# pacman -S grub efibootmgr os-prober sbsigntools efitools
 ```
 
-Una vez esto este listo, reiniciar sistema y verificar la instalación.
-En caso de que no aparezcan caracteres, buscar la respectiva fuente y asegurar que en locale.gen se encuentre los charsets deseados.
-***Nota Importante: Seguir guía siendo un usuario experimentado. En caso de tener dudas contacte a algún conocido que tenga alto conocimiento para evitar complicaciones.***
+Crear directorio en el cual se monta la partición de EFI e instalar grub en dicha partición con las siguientes opciones:
+
+```
+# mkdir /boot/efi; mount /dev/sdX1 /boot/efi
+# grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Arch --modules="tpm" --disable-shim-lock
+```
+
+Instalar el siguiente paquete con AUR: 
+
+```
+# git clone https://aur.archlinux.org/shim-signed.git
+# cd shim-signed
+# makepkg -si
+```
+
+Copiar los siguientes archivos desde /usr/share hasta la partición del EFI:
+
+```
+# cp /usr/share/shim-signed/shimx64.efi /boot/efi/EFI/Arch/shimx64.efi
+# cp /usr/share/shim-signed/mmx64.efi /boot/efi/EFI/Arch
+```
+
+Crear entry para Secure-boot: 
+
+```
+# efibootmgr --verbose --disk /dev/sdX1 --create --label "Arch Secure-Boot" --loader /EFI/Arch/shimx64.efi
+```
+
+Una vez esto este listo, reiniciar sistema y hacer el enroll de la llave MOK:
+
+```
+**MOK Manager -> Enroll hash from disk -> EFI/Arch/grubx64.efi**
+```
+
+Para efectos de prueba, una vez realizada la instalación, se puede crear un entry para el MOK manager: 
+
+```
+# efibootmgr --verbose --disk /dev/sdX1 --create --label "MOK manager" --loader /EFI/Arch/mmx64.efi
+```
+
+**Otros comandos útiles:**
+
+Verificar en que arranca con bootctl:
+
+```
+# bootctl status
+```
+
+Ver entries con efibootmgr
+
+```
+# efibootmgr -v
+```
+
+Borrar un entry con efibootmgr (Ver entries primero para verificar que sea el bootnum correcto):
+
+```
+# efibootmgr -b XXXX -B
+```
 
