@@ -1,6 +1,6 @@
 # Instalación de Arch GNU/Linux :
 
-***NOTA: El caracter '#' hace referencia a el usuario root. En donde se especifique que es un archivo, dicho caracter cuenta como comentario.***
+***NOTA: El caracter '#' hace referencia a el usuario root en los segmentos de comandos. En donde se especifique que es un archivo de configuración, dicho caracter cuenta como un comentario.***
 
 Cambiar teclado a español LA:
 
