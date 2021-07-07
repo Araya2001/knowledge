@@ -256,9 +256,11 @@ Borrar un entry con efibootmgr (Ver entries primero para verificar que sea el bo
 
 **Archivo personal de /etc/default/grub**
 
-```bash
+```
 # nano /etc/default/grub
-...
+```
+
+```bash
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Arch"
@@ -273,7 +275,6 @@ GRUB_GFXMODE="1920x1080x32"
 GRUB_GFXPAYLOAD_LINUX=keep
 GRUB_DISABLE_RECOVERY=true
 GRUB_DISABLE_OS_PROBER=false
-...
 ```
 
 Actualizar grub:
