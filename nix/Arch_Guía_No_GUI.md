@@ -1,5 +1,7 @@
 # Instalación de Arch GNU/Linux :
 
+***NOTA: El caracter '#' hace referencia al prompt en modo root en los bloques de línea de comando. En donde se especifique que es un archivo de configuración, dicho caracter cuenta como un comentario.***
+
 Cambiar teclado a español LA:
 
 ```
@@ -336,9 +338,17 @@ root# efibootmgr -b XXXX -B
 
 **Archivo personal de /etc/default/grub**
 
+<<<<<<< HEAD
 ```bash
 root# nano /etc/default/grub
 ...
+=======
+```
+# nano /etc/default/grub
+```
+
+​```bash
+>>>>>>> 3e85fac233f5d378bd3213f2abd8c6ea9cf301c6
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Arch"
@@ -353,7 +363,6 @@ GRUB_GFXMODE="1920x1080x32"
 GRUB_GFXPAYLOAD_LINUX=keep
 GRUB_DISABLE_RECOVERY=true
 GRUB_DISABLE_OS_PROBER=false
-...
 ```
 
 **Archivo personal de Arch.conf**
