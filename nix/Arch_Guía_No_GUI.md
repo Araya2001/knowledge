@@ -3,28 +3,28 @@
 Cambiar teclado a español LA:
 
 ```
-# loadkeys la-latin1
+root# loadkeys la-latin1
 ```
 
 Verificar estado de red (Si es DHCP por cable, solo hacer ping):
 
 ```
-# ping 8.8.8.8
+root# ping 8.8.8.8
 ```
 
 Actualizar el reloj del sistema:
 
 ```
-# timedatectl set-ntp true
-# timedatectl status
+root# timedatectl set-ntp true
+root# timedatectl status
 ```
 
 Particionar los discos:
 */dev/sdX no es un parámetro fijo, este cambia según este nombrado el dispositivo de almacenamiento a usar
 
 ```
-# lsblk
-# cfdisk /dev/sdX
+root# lsblk
+root# cfdisk /dev/sdX
 ```
 
 Usar gpt
@@ -34,81 +34,87 @@ Una vez creado, instalar dosfstools
 Crear FS para "EFI System" y "Linux filesystem":
 
 ```
-# mkfs.fat -F32 /dev/sdX1
-# mkfs.ext4 /dev/sdX2
+root# mkfs.fat -F32 /dev/sdX1
+root# mkfs.ext4 /dev/sdX2
 ```
 
 **Adicional:**
 
 ```
-# mkswap /dev/sdX3
+root# mkswap /dev/sdX3
 ```
 
 Montar dispositivos de almacenamiento:
 
 ```
-# mount /dev/sdX2 /mnt
+root# mount /dev/sdX2 /mnt
 ```
 
 **Adicional:**
 
 ```
-# swapon /dev/sdX3
+root# swapon /dev/sdX3
 ```
 
 Sincronizar repo:
 
 ```
-# pacman -Syy
+root# pacman -Syy
 ```
 
 Instalar reflector:
 
 ```
-# pacman -S reflector
+root# pacman -S reflector
 ```
 
 Crear backup de mirrorlist:
 
 ```
-# cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+root# cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 ```
 
 Actualizar el mirror list a US:
 
 ```
-# reflector -c "US" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
+root# reflector -c "US" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
 ```
 
 Instalar linux:
 
 ```
-# pacstrat /mnt base linux linux-firmware
+root# pacstrat /mnt base linux linux-firmware intel-ucode
+```
+
+En caso de ser CPU AMD:
+
+```
+root# pacstrat /mnt base linux linux-firmware amd-ucode
 ```
 
 Generar fstab
 
 ```
-# genfstab -U /mnt >> /mnt/etc/fstab
+root# genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
 Cambiar root:
 
 ```
-# arch-chroot /mnt
+root# arch-chroot /mnt
 ```
 
 Una vez dentro, cambiar zona horaria:
 
 ```
-# timedatectl list-timezones
-# timedatectl set-timezone America/Costa_Rica
+root# timedatectl list-timezones
+root# timedatectl set-timezone America/Costa_Rica
 ```
 
 Setear locale:
 
 ```
-# nano /etc/locale.gen
+root# nano /etc/locale.gen
 ```
 
 Quitar comentario del (los) locale(s) que se desee(n)
@@ -116,23 +122,23 @@ Quitar comentario del (los) locale(s) que se desee(n)
 Generar locale:
 
 ```
-# locale-gen
-# echo LANG=[locale_name] > /etc/locale.conf
+root# locale-gen
+root# echo LANG=[locale_name] > /etc/locale.conf
 ```
 
 Setear hostname:
 
 ```
-# echo [hostname] > /etc/hostname
+root# echo [hostname] > /etc/hostname
 ```
 
 Crear y modificar el siguiente archivo:
 
 ```
-# nano /etc/hosts
+root# nano /etc/hosts
 ```
 
-En /etc/hosts:
+En */etc/hosts*:
 
 ```
 127.0.0.1       localhost
@@ -143,10 +149,10 @@ En /etc/hosts:
 DHCP en interfaz:
 
 ```
-# nano /etc/systemd/network/20-wired.network
+root# nano /etc/systemd/network/20-wired.network
 ```
 
-En /etc/systemd/network/20-wired.network:
+En */etc/systemd/network/20-wired.network*:
 
 ```bash
 [Match]
@@ -159,77 +165,153 @@ DHCP=yes
 Verificar que el systemd-networkd.service este habilitado:
 
 ```
-# systemctl status systemd-networkd.service
+root# systemctl status systemd-networkd.service
 ```
 
 Instalar binutils y fakeroot para usar makepkg (Ver documentación de AUR):
 
 ```
-# pacman -S binutils fakeroot
+root# pacman -S binutils fakeroot
 ```
 
-**No Secure-boot:** 
+**No Secure-boot Grub:** 
 
 Instalar grub, os-prober y efibootmgr:
 
 ```
-# pacman -S grub efibootmgr os-prober
+root# pacman -S grub efibootmgr os-prober
 ```
 
 Instalar grub en partición para efi:
 
 ```
-# mkdir /boot/efi; mount /dev/sdX1 /boot/efi
-# grub-install --target=x86_64-efi --bootloader-id=Arch --efi-directory=/boot/efi
-# grub-mkconfig -o /boot/grub/grub.cfg
+root# mkdir /boot/efi; mount /dev/sdX1 /boot/efi
+root# grub-install --target=x86_64-efi --bootloader-id=Arch --efi-directory=/boot/efi
+root# grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-**Secure-boot:**
+**Systemd-boot:**
 
-Instalar los siguientes paquetes:
-
-```
-# pacman -S grub efibootmgr os-prober sbsigntools efitools
-```
-
-Crear directorio en el cual se monta la partición de EFI e instalar grub en dicha partición con las siguientes opciones:
+Crear copia de boot y montar partición de EFI en */boot*
 
 ```
-# mkdir /boot/efi; mount /dev/sdX1 /boot/efi
-# grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Arch --modules="tpm" --disable-shim-lock
+root# mkdir /boot-backup; cp -r /boot/* /boot-backup
+root# /etc/fstab
+root# nano /etc/fstab
 ```
 
-Instalar el siguiente paquete con AUR: 
+En *fstab*, agregar
 
-```
-# git clone https://aur.archlinux.org/shim-signed.git
-# cd shim-signed
-# makepkg -si
-```
+Agregar el UUID de la partición donde se encuentra el EFI, revisar con *blkid*
 
-Copiar los siguientes archivos desde /usr/share hasta la partición del EFI:
-
-```
-# cp /usr/share/shim-signed/shimx64.efi /boot/efi/EFI/Arch/shimx64.efi
-# cp /usr/share/shim-signed/mmx64.efi /boot/efi/EFI/Arch
+```bash
+UUID=XXXX                                /boot           vfat            rw,discard,relatime,noatime,errors=remount-ro   0 1
 ```
 
-Crear entry para Secure-boot: 
+Montar partición:
 
 ```
-# efibootmgr --verbose --disk /dev/sdX1 --create --label "Arch Secure-Boot" --loader /EFI/Arch/shimx64.efi
+root# mount /dev/sdX1 /boot
 ```
 
-Una vez esto este listo, reiniciar sistema y hacer el enroll de la llave MOK:
+Instalar systemd-boot:
 
 ```
-**MOK Manager -> Enroll hash from disk -> EFI/Arch/grubx64.efi**
+root# sudo bootctl --esp-path=/boot/efi
 ```
 
-Para efectos de prueba, una vez realizada la instalación, se puede crear un entry para el MOK manager: 
+Copiar el antiguo /boot (/boot-backup) a la partición montada:
 
 ```
-# efibootmgr --verbose --disk /dev/sdX1 --create --label "MOK manager" --loader /EFI/Arch/mmx64.efi
+root# cp -r /boot-backup/* /boot
+```
+
+Actualizar initramfs:
+
+```
+root# mkinitpcio -P
+```
+
+Modificar entries y configuración de loader:
+
+*Revisar previamente los UUIDs de cada partición con **blkid***
+
+```
+root# nano /boot/loader/loader.conf
+```
+
+En *loader.conf*
+
+```bash
+default  entries/arch.conf
+timeout  1
+console-mode max
+editor   yes
+```
+
+Crear siguiente archivo:
+
+```
+root# nano /boot/loader/entries/arch.conf
+```
+
+En *arch.conf*
+
+```bash
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /intel-ucode.img
+initrd  /initramfs-linux.img
+options root=PARTUUID="XXXX" rootfstype="ext4" rw add_efi_memmap loglevel=3 vt.color=0x02
+# Nota: rootfstype no ha de ser obligatorio, si se usa otro filesystem, especificar el debido nombre en rootfstype
+# vt.color es un valor en Hexadecimal, el splash en "verbose" se vuelve color verde. ver más en https://www.kernel.org/doc/html/v4.15/admin-guide/kernel-parameters.html
+# En caso de ser amd, descargar amd-ucode
+# El microcódigo debe ser cargado primero que el kernel en el caso de máquinas AMD.
+```
+
+Crear el archivo de fallback
+
+```
+root# nano /boot/loader/entries/arch-fallback.conf
+```
+
+En *arch-fallback.conf*
+
+```bash
+title   Arch Linux (fallback initramfs)
+linux   /vmlinuz-linux
+initrd  /intel-ucode.img
+initrd  /initramfs-linux-fallback.img
+options root=PARTUUID="XXXX" rootfstype="ext4" rw add_efi_memmap
+# Nota: rootfstype no ha de ser obligatorio, si se usa otro filesystem, especificar el debido nombre en rootfstype
+# En caso de ser amd, descargar amd-ucode
+# El microcódigo debe ser cargado primero que el kernel en el caso de máquinas AMD.
+```
+
+Crear hook en pacman.d para actualizar systemd-boot:
+
+```
+root# nano /etc/pacman.d/hooks/100-systemd-boot-update.hook
+```
+
+En *100-systemd-boot-update.hook*
+
+```bash
+[Trigger]
+Type = Package
+Operation = Upgrade
+Target = systemd
+
+[Action]
+Description = Updating systemd-boot
+When = PostTransaction
+Exec = /usr/bin/bootctl update
+```
+
+Para actualizar systemd-boot de forma manual:
+
+```
+root# bootctl update
 ```
 
 **Otros comandos útiles:**
@@ -237,25 +319,25 @@ Para efectos de prueba, una vez realizada la instalación, se puede crear un ent
 Verificar en que arranca con bootctl:
 
 ```
-# bootctl status
+root# bootctl status
 ```
 
 Ver entries con efibootmgr
 
 ```
-# efibootmgr -v
+root# efibootmgr -v
 ```
 
 Borrar un entry con efibootmgr (Ver entries primero para verificar que sea el bootnum correcto):
 
 ```
-# efibootmgr -b XXXX -B
+root# efibootmgr -b XXXX -B
 ```
 
 **Archivo personal de /etc/default/grub**
 
 ```bash
-# nano /etc/default/grub
+root# nano /etc/default/grub
 ...
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=1
@@ -274,15 +356,25 @@ GRUB_DISABLE_OS_PROBER=false
 ...
 ```
 
+**Archivo personal de Arch.conf**
+
+```bash
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /intel-ucode.img
+initrd  /initramfs-linux.img
+options root=PARTUUID="6cc45006-6311-ef4a-9f62-d263c6861a40" rootfstype="ext4" rw add_efi_memmap loglevel=3 i8042.noaux=1 iommu=pt intel_iommu=on pcie_acs_override=downstream,multifunction vt.color=0x02
+```
+
 Actualizar grub:
 
 ```
-# grub-mkconfig -o /boot/grub/grub.cfg
+root# grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
 Actualizar initram:
 
 ```
-# sudo mkinitcpio -P
+root# sudo mkinitcpio -P
 ```
 
