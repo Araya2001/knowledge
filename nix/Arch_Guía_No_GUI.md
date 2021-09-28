@@ -85,7 +85,7 @@ root# reflector -c "US" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
 Instalar linux:
 
 ```
-root# pacstrat /mnt base linux linux-firmware intel-ucode
+root# pacstrap /mnt base linux linux-firmware intel-ucode
 ```
 
 En caso de ser CPU AMD:
