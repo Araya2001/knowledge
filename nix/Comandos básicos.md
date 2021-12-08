@@ -390,3 +390,8 @@ Ver que daemon de inicialización se encuentra corriendo actualmente
 $ ps -e | head -n 2
 ```
 
+Ver que proceso está usando un puerto en específico:
+
+```
+`$ lsof -i :8080
+```
