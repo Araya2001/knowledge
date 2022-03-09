@@ -45,7 +45,7 @@ root# swapon /dev/sda3
 
 Instalar Base:
 ``` bash
-root# pacstrap /mnt/ base base-devel linux-lts linux-firmware intel-ucode openssh
+root# pacstrap /mnt/ base base-devel linux-lts linux-firmware intel-ucode openssh nano arch-install-scripts
 ```
 
 ```
