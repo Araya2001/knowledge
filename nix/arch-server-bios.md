@@ -34,7 +34,7 @@ _Los tamaños son preferencia de quien proceda con la instalación_
 Generar filesystems:
 ``` bash
 root# mkfs.ext4 /dev/sda2
-root# mkswp /dev/sda3
+root# mkswap /dev/sda3
 ```
 
 Montar filesystems:
